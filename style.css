@@ -1,3 +1,13 @@
-h1{
-    color: blue;
+
+.pt-2{
+    padding-top:20px;
+}
+
+.container{
+    margin-bottom:20px; 
+}
+
+.form-control{
+    width:25%;
+    display:inline;
 }
