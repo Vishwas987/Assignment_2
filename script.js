@@ -1,5 +1,6 @@
 
 var bookList;
+var bookListCurrent;
 
 async function fetchBooks(){
     let books;
@@ -16,17 +17,24 @@ async function fetchBooks(){
     return books;
 }
 
+function renderBookList(books){
+    let tBody = document.getElementById('tbody-all-books');
+    tBody.innerHTML = "";
+
+    books.forEach(function (book) {
+        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
+    });
+}
+
 function pageSetup(){
     document.getElementById ("btn-search-id").addEventListener ("click", searchById, false);
     document.getElementById ("btn-search-genre").addEventListener ("click", searchByGenre, false);
     document.getElementById ("btn-search-price").addEventListener ("click", searchByPrice, false);
+    document.getElementById ("book-price-col").addEventListener ("click", sortByPrice, false);
 
-    let tBody = document.getElementById('tbody-all-books');
-
-    bookList.forEach(function (book) {
-        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
-    });
+    renderBookList(bookList);
     
+    bookListCurrent = bookList;
 }
 
 function searchById(){
@@ -34,14 +42,9 @@ function searchById(){
     if(id.length <= 0)return;
 
     id = parseInt(id);
-    let books = bookList.filter(book => book.bookId === id);
+    bookListCurrent = bookList.filter(book => book.bookId === id);
 
-    let tBody = document.getElementById('tbody-all-books');
-    tBody.innerHTML = "";
-
-    books.forEach(function (book) {
-        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
-    });
+    renderBookList(bookListCurrent);
 
     //console.log(books);
 }
@@ -51,14 +54,9 @@ function searchByGenre(){
     if(genre.length <= 0)return;
 
     genre = genre.toLowerCase();
-    let books = bookList.filter(book => book.genre.toLowerCase() === genre);
+    bookListCurrent = bookList.filter(book => book.genre.toLowerCase() === genre);
 
-    let tBody = document.getElementById('tbody-all-books');
-    tBody.innerHTML = "";
-
-    books.forEach(function (book) {
-        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
-    });
+    renderBookList(bookListCurrent);
 
     //console.log(books);
 }
@@ -68,20 +66,33 @@ function searchByPrice(){
     if(price.length <= 0)return;
 
     price = parseInt(price);
-    let books = bookList.filter(book => book.price === price);
+    bookListCurrent = bookList.filter(book => book.price === price);
 
-    let tBody = document.getElementById('tbody-all-books');
-    tBody.innerHTML = "";
-
-    books.forEach(function (book) {
-        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
-    });
+    renderBookList(bookListCurrent);
 
     //console.log(books);
 }
 
+function sortByPrice(){
+    let asc = true, dsc = true;
+    for(let i = 0; i<bookListCurrent.length-1; i++){ // Check if sorted
+        if(bookListCurrent[i].price > bookListCurrent[i+1].price){
+            asc = false;
+        }
+        if(bookListCurrent[i].price < bookListCurrent[i+1].price){
+            dsc = false;
+        }
+    }
+
+    if(asc === true || dsc === true){ // If already sorted just reverse
+        bookListCurrent.reverse();
+    }
+    else { // Else sort in ascending order
+        bookListCurrent = bookListCurrent.sort((b1, b2) => (b1.price > b2.price) ? 1 : (b1.price < b2.price) ? -1 : 0);
+    }
+
+    renderBookList(bookListCurrent);
+}
+
 bookList = await fetchBooks();
 pageSetup();
-
-//console.log(bookList);
-//console.log(searchByGenre("Fantasy"));
