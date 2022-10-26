@@ -1,29 +1,29 @@
 
 var bookList;
 var bookListCurrent;
+var isSorted = false;
 
 async function fetchBooks(){
-    let books;
-    await fetch('book_list.json').then(response => {
-        if(!response.ok){
-            throw new Error("HTTP error " + response.status);
-        }
-        return response.json();
-    })
-    .then(data => {
-        books = data;
-    });
+
+    const response = await fetch('book_list.json');
+    if(!response.ok){
+        throw new Error("HTTP error " + response.status);
+    }
+
+    const data = await response.json();
     
-    return books;
+    return data;
 }
 
 function renderBookList(books){
     let tBody = document.getElementById('tbody-all-books');
-    tBody.innerHTML = "";
+    let bookListHtml = "";
 
     books.forEach(function (book) {
-        tBody.insertAdjacentHTML('beforeend', `<td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td>`);
+        bookListHtml += `<tr><td>${book.bookId}</td><td>${book.genre}</td><td>${book.price}</td><td>No</td></tr>`;
     });
+
+    tBody.innerHTML = bookListHtml;
 }
 
 function pageSetup(){
@@ -74,25 +74,35 @@ function searchByPrice(){
 }
 
 function sortByPrice(){
-    let asc = true, dsc = true;
-    for(let i = 0; i<bookListCurrent.length-1; i++){ // Check if sorted
-        if(bookListCurrent[i].price > bookListCurrent[i+1].price){
-            asc = false;
-        }
-        if(bookListCurrent[i].price < bookListCurrent[i+1].price){
-            dsc = false;
-        }
-    }
+    // let asc = true, dsc = true;
+    // for(let i = 0; i<bookListCurrent.length-1; i++){ // Check if sorted
+    //     if(bookListCurrent[i].price > bookListCurrent[i+1].price){
+    //         asc = false;
+    //     }
+    //     if(bookListCurrent[i].price < bookListCurrent[i+1].price){
+    //         dsc = false;
+    //     }
+    // }
 
-    if(asc === true || dsc === true){ // If already sorted just reverse
-        bookListCurrent.reverse();
+    // if(asc === true || dsc === true){ // If already sorted just reverse
+    //     bookListCurrent.reverse();
+    // }
+    // else { // Else sort in ascending order
+    //     //bookListCurrent = bookListCurrent.sort((b1, b2) => (b1.price > b2.price) ? 1 : (b1.price < b2.price) ? -1 : 0);
+    //     bookListCurrent = bookListCurrent.sort((b1, b2) => b1.price - b2.price);
+    // }
+
+    if(isSorted === false){
+        bookListCurrent = bookListCurrent.sort((b1, b2) => b1.price - b2.price);
+        isSorted = true;
     }
-    else { // Else sort in ascending order
-        bookListCurrent = bookListCurrent.sort((b1, b2) => (b1.price > b2.price) ? 1 : (b1.price < b2.price) ? -1 : 0);
+    else {
+        bookListCurrent.reverse();
     }
 
     renderBookList(bookListCurrent);
 }
 
 bookList = await fetchBooks();
+//console.log(bookList);
 pageSetup();
